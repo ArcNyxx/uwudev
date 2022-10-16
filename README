@@ -1,0 +1,14 @@
+uwudev - scrunklificator
+========================
+uwudev outputs infinite catgirl nonsense.
+
+Installation
+------------
+uwudev comes with a Makefile and config.mk file for configurable building and
+testing.  Edit the latter to match your local setup (uwudev is installed into
+the /usr/local namespace by default, you may need to modify your $PATH).
+
+uwudev can be built and installed with the following command (run as root):
+
+    make clean install
+

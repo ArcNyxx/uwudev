@@ -7,24 +7,11 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef _WIN32
-
-#pragma comment(lib, "bcrypt.lib")
-#include <Windows.h>
-#include <io.h>
-#include <bcrypt.h>
-
-#define write _write
-
-#else
-
 #include <sys/random.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#endif
 
 typedef struct uwu_markov_choice uwu_markov_choice;
 struct uwu_markov_choice {
@@ -1358,29 +1345,6 @@ static uint16_t get_random_int16(uwu_state *state) {
     return ret;
 }
 
-#ifdef _WIN32
-static void getrandom(void *buf, size_t buflen, unsigned int flags) {
-    // Windows absolutely sucks
-
-    BCRYPT_ALG_HANDLE provider;
-    if (!BCRYPT_SUCCESS(
-            BCryptOpenAlgorithmProvider(&provider, BCRYPT_RNG_ALGORITHM, NULL, 0)
-            )) {
-        fprintf(stderr, "error: couldn't generate random number");
-        exit(1);
-    }
-
-    if (!BCRYPT_SUCCESS(
-            BCryptGenRandom(provider, buf, buflen, 0)
-            )) {
-        fprintf(stderr, "error: couldn't generate random number");
-        exit(1);
-    }
-
-    BCryptCloseAlgorithmProvider(provider, 0);
-}
-#endif
-
 // Pick a random program from the list of programs and write it to the ops list
 static void generate_new_ops(uwu_state *state) {
     uint8_t random = get_random_int(state);
@@ -1652,7 +1616,6 @@ int main() {
 
     generate_new_ops(data);
 
-#ifndef _WIN32
     FILE *fd = fopen("/proc/sys/fs/pipe-max-size", "r");
 
     int pipe_max_size;
@@ -1668,9 +1631,6 @@ int main() {
     fcntl(1, F_SETPIPE_SZ, pipe_max_size);
 
     size_t uwu_buf_len = (size_t) pipe_max_size;
-#else
-    size_t uwu_buf_len = 8192;
-#endif
 
     char *uwu_buf = malloc(uwu_buf_len);
     // mmap(NULL, uwu_buf_len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -1682,7 +1642,6 @@ int main() {
         return ENOMEM;
     }
 
-#ifndef _WIN32
     struct stat stat_buf;
     int status = fstat(1, &stat_buf);
 
@@ -1708,13 +1667,11 @@ int main() {
         vec->iov_base = uwu_buf;
         vec->iov_len = uwu_buf_len;
     }
-#endif
 
     while (1) {
         int result = write_chars(data, uwu_buf, uwu_buf_len);
         if (result < 0) return result;
 
-#ifndef _WIN32
         if (is_pipe) {
             // It doesn't actually matter if we write to the buffer in the middle of a read,
             // it's all nonsense anyway
@@ -1722,8 +1679,5 @@ int main() {
         } else {
             write(1, uwu_buf, uwu_buf_len);
         }
-#else
-        write(1, uwu_buf, uwu_buf_len);
-#endif
     }
 }
