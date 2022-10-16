@@ -4,6 +4,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -1304,52 +1305,12 @@ static string_with_len actions[] = {
         STRING_WITH_LEN("*sneezes*"),
         STRING_WITH_LEN("*plays with yarn*"),
         STRING_WITH_LEN("*eats all ur doritos*"),
-        STRING_WITH_LEN("*lies down on a random surface*")
+        STRING_WITH_LEN("*lies down on a rsurface*")
 };
 
-uint64_t rol64(uint64_t x, int k) {
-    return (x << k) | (x >> (64 - k));
-}
-
-static void ensure_randbuf(uwu_t *state, size_t size) {
-    if (size < (sizeof(uint64_t) - state->rng_idx)) {
-        uint64_t *s = state->rand_state;
-        *(state->rng_buf) = rol64(s[1] * 5, 7) * 9;
-        uint64_t const t = s[1] << 17;
-
-        s[2] ^= s[0];
-        s[3] ^= s[1];
-        s[1] ^= s[2];
-        s[0] ^= s[3];
-
-        s[2] ^= t;
-        s[3] = rol64(s[3], 45);
-
-        state->rng_idx = 0;
-    }
-}
-
-static uint8_t get_random_int(uwu_t *state) {
-    ensure_randbuf(state, sizeof(uint8_t));
-
-    uint8_t ret = state->rng_buf[state->rng_idx];
-    state->rng_idx += sizeof(uint8_t);
-
-    return ret;
-}
-
-static uint16_t get_random_int16(uwu_t *state) {
-    ensure_randbuf(state, sizeof(uint16_t));
-
-    uint16_t ret = state->rng_buf[state->rng_idx];
-    state->rng_idx += sizeof(uint16_t);
-
-    return ret;
-}
-
-// Pick a random program from the list of programs and write it to the ops list
+// Pick a rprogram from the list of programs and write it to the ops list
 static void generate_new_ops(uwu_t *state) {
-    uint8_t random = get_random_int(state);
+    uint8_t r = (random() & UCHAR_MAX);
 
     static uwu_op null_op = {
             .opcode = UWU_NULL
@@ -1358,19 +1319,19 @@ static void generate_new_ops(uwu_t *state) {
     static const int NUM_OPS = 10;
 
     if (state->prev_op == -1) {
-        random %= NUM_OPS;
+        r %= NUM_OPS;
     } else {
         // don't repeat previous op
-        random %= NUM_OPS - 1;
-        if (random >= state->prev_op) {
-            random += 1;
+        r %= NUM_OPS - 1;
+        if (r >= state->prev_op) {
+            r += 1;
         }
     }
 
-    state->prev_op = random;
+    state->prev_op = r;
 
     uwu_op *ops = state->ops;
-    switch (random) {
+    switch (r) {
         case 0: { // uwu
             uwu_op op = CREATE_PRINT_STRING("uwu");
             ops[0] = op;
@@ -1378,14 +1339,14 @@ static void generate_new_ops(uwu_t *state) {
             break;
         }
         case 1: { // catgirl nonsense
-            random = get_random_int(state);
+            r = (random() & UCHAR_MAX);
             uwu_op op1 = CREATE_PRINT_STRING("mr");
             uwu_op op2 = {
                     .opcode = UWU_MARKOV,
                     .state = {
                             .markov = {
                                     .prev_ngram = 7, // mr
-                                    .remaining_chars = (random % 125) + 25,
+                                    .remaining_chars = (r % 125) + 25,
                                     .ngrams = catnonsense_ngrams
                             }
                     }
@@ -1398,18 +1359,18 @@ static void generate_new_ops(uwu_t *state) {
             break;
         }
         case 2: { // nyaaaaaaa
-            random = get_random_int(state);
+            r = (random() & UCHAR_MAX);
             uwu_op op1 = CREATE_PRINT_STRING("ny");
-            uwu_op op2 = CREATE_REPEAT_CHARACTER('a', (random % 7) + 1);
+            uwu_op op2 = CREATE_REPEAT_CHARACTER('a', (r % 7) + 1);
             ops[0] = op1;
             ops[1] = op2;
             ops[2] = null_op;
             break;
         }
         case 3: { // >/////<
-            random = get_random_int(state);
+            r = (random() & UCHAR_MAX);
             uwu_op op1 = CREATE_PRINT_STRING(">");
-            uwu_op op2 = CREATE_REPEAT_CHARACTER('/', (random % 4) + 3);
+            uwu_op op2 = CREATE_REPEAT_CHARACTER('/', (r % 4) + 3);
             uwu_op op3 = CREATE_PRINT_STRING("<");
             ops[0] = op1;
             ops[1] = op2;
@@ -1424,8 +1385,8 @@ static void generate_new_ops(uwu_t *state) {
             break;
         }
         case 5: { // actions
-            random = get_random_int(state);
-            string_with_len action = actions[random % (sizeof(actions) / sizeof(string_with_len))];
+            r= (random() & UCHAR_MAX);
+            string_with_len action = actions[r% (sizeof(actions) / sizeof(string_with_len))];
             uwu_op op = {
                     .opcode = UWU_PRINT_STRING,
                     .state = {
@@ -1440,13 +1401,13 @@ static void generate_new_ops(uwu_t *state) {
             break;
         }
         case 6: { // keyboard mash
-            random = get_random_int(state);
+            r= (random() & UCHAR_MAX);
             uwu_op op = {
                     .opcode = UWU_MARKOV,
                     .state = {
                             .markov = {
-                                    .prev_ngram = random % (sizeof(keysmash_ngrams) / sizeof(uwu_markov_ngram)),
-                                    .remaining_chars = (random % 125) + 25,
+                                    .prev_ngram = r% (sizeof(keysmash_ngrams) / sizeof(uwu_markov_ngram)),
+                                    .remaining_chars = (r% 125) + 25,
                                     .ngrams = keysmash_ngrams
                             }
                     }
@@ -1456,8 +1417,8 @@ static void generate_new_ops(uwu_t *state) {
             break;
         }
         case 7: { // screaming
-            random = get_random_int(state);
-            uwu_op op = CREATE_REPEAT_CHARACTER('A', (random % 12) + 5);
+            r= (random() & UCHAR_MAX);
+            uwu_op op = CREATE_REPEAT_CHARACTER('A', (r% 12) + 5);
             ops[0] = op;
             ops[1] = null_op;
             break;
@@ -1469,7 +1430,7 @@ static void generate_new_ops(uwu_t *state) {
                     .state = {
                             .markov = {
                                     .prev_ngram = 37, // aw
-                                    .remaining_chars = (random % 75) + 25,
+                                    .remaining_chars = (r% 75) + 25,
                                     .ngrams = scrunkly_ngrams
                             }
                     }
@@ -1519,14 +1480,14 @@ static int exec_op(uwu_t *state, char *buf, size_t len) {
             int i;
             for (i = 0; i < num_chars_to_copy; i++) {
                 uwu_markov_ngram ngram = ngrams[ngram_index];
-                uint16_t random = get_random_int16(state);
-                random %= ngram.total_probability;
+                uint16_t r= (random() & USHRT_MAX);
+                r%= ngram.total_probability;
 
                 int j = 0;
                 while (true) {
                     uwu_markov_choice choice = ngram.choices[j];
                     size_t cumulative_probability = choice.cumulative_probability;
-                    if (random < cumulative_probability) {
+                    if (r< cumulative_probability) {
                         ngram_index = choice.next_ngram;
                         memcpy(buf + i, &choice.next_char, 1);
                         break;
@@ -1591,9 +1552,13 @@ static int write_chars(uwu_t *state, char *buf, size_t n) {
     return 0;
 }
 
+#include <time.h>
+
 int
 main(int argc, char **argv)
 {
+	srandom(time(NULL));
+
 	uwu_t uwu = { .prev_op = -1, .rng_idx = sizeof(uint64_t) };
 	getrandom(uwu.rand_state, sizeof(uwu.rand_state), 0);
 	if ((uwu.rng_buf = malloc(sizeof(uint64_t))) == NULL)
