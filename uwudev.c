@@ -1,17 +1,18 @@
-#define _GNU_SOURCE
+/* uwudev - scrunklificator
+ * Copyright (C) 2022 ArcNyxx
+ * see LICENCE file for licensing information */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
 #include <errno.h>
-
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/random.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 typedef struct uwu_markov_choice uwu_markov_choice;
 struct uwu_markov_choice {
@@ -73,7 +74,8 @@ typedef struct {
 
 #define MAX_OPS 4
 
-typedef struct {
+
+typedef struct uwu {
     uwu_op ops[MAX_OPS];
     size_t current_op;
     int prev_op;
@@ -81,7 +83,7 @@ typedef struct {
     uint64_t rand_state[4];
     char *rng_buf;
     size_t rng_idx;
-} uwu_state;
+} uwu_t;
 
 static struct uwu_markov_choice catnonsense_ngram0_choices[] = {
         {.next_ngram = 0, .cumulative_probability = 2, .next_char = 'a'},
@@ -1309,7 +1311,7 @@ uint64_t rol64(uint64_t x, int k) {
     return (x << k) | (x >> (64 - k));
 }
 
-static void ensure_randbuf(uwu_state *state, size_t size) {
+static void ensure_randbuf(uwu_t *state, size_t size) {
     if (size < (sizeof(uint64_t) - state->rng_idx)) {
         uint64_t *s = state->rand_state;
         *(state->rng_buf) = rol64(s[1] * 5, 7) * 9;
@@ -1327,7 +1329,7 @@ static void ensure_randbuf(uwu_state *state, size_t size) {
     }
 }
 
-static uint8_t get_random_int(uwu_state *state) {
+static uint8_t get_random_int(uwu_t *state) {
     ensure_randbuf(state, sizeof(uint8_t));
 
     uint8_t ret = state->rng_buf[state->rng_idx];
@@ -1336,7 +1338,7 @@ static uint8_t get_random_int(uwu_state *state) {
     return ret;
 }
 
-static uint16_t get_random_int16(uwu_state *state) {
+static uint16_t get_random_int16(uwu_t *state) {
     ensure_randbuf(state, sizeof(uint16_t));
 
     uint16_t ret = state->rng_buf[state->rng_idx];
@@ -1346,7 +1348,7 @@ static uint16_t get_random_int16(uwu_state *state) {
 }
 
 // Pick a random program from the list of programs and write it to the ops list
-static void generate_new_ops(uwu_state *state) {
+static void generate_new_ops(uwu_t *state) {
     uint8_t random = get_random_int(state);
 
     static uwu_op null_op = {
@@ -1487,7 +1489,7 @@ static void generate_new_ops(uwu_state *state) {
 }
 
 // Execute an operation once. Returns the number of characters written, or a negative value on error.
-static int exec_op(uwu_state *state, char *buf, size_t len) {
+static int exec_op(uwu_t *state, char *buf, size_t len) {
     uwu_op *op = &state->ops[state->current_op];
     switch (op->opcode) {
         case UWU_PRINT_STRING: {
@@ -1561,7 +1563,7 @@ static int exec_op(uwu_state *state, char *buf, size_t len) {
 static const char SPACE = ' ';
 
 // Fill the given buffer with UwU
-static int write_chars(uwu_state *state, char *buf, size_t n) {
+static int write_chars(uwu_t *state, char *buf, size_t n) {
     size_t total_written = 0;
     while (total_written < n) {
         if (state->print_space) {
@@ -1589,95 +1591,19 @@ static int write_chars(uwu_state *state, char *buf, size_t n) {
     return 0;
 }
 
-int main() {
-    size_t len = sizeof(uwu_state);
+int
+main(int argc, char **argv)
+{
+	uwu_t uwu = { .prev_op = -1, .rng_idx = sizeof(uint64_t) };
+	getrandom(uwu.rand_state, sizeof(uwu.rand_state), 0);
+	if ((uwu.rng_buf = malloc(sizeof(uint64_t))) == NULL)
+		return 1;
+	generate_new_ops(&uwu);
 
-    uwu_state *data = malloc(len);
-
-    getrandom(data->rand_state, sizeof(((uwu_state *) 0)->rand_state), 0);
-
-    if (data == NULL) {
-        fprintf(stderr, "error: out of memory");
-        return ENOMEM;
-    }
-
-    char *rng_buf = malloc(sizeof(uint64_t));
-
-    if (rng_buf == NULL) {
-        fprintf(stderr, "error: out of memory");
-        free(data);
-        return ENOMEM;
-    }
-
-    data->prev_op = -1;
-    data->current_op = 0;
-    data->rng_buf = rng_buf;
-    data->rng_idx = sizeof(uint64_t);
-
-    generate_new_ops(data);
-
-    FILE *fd = fopen("/proc/sys/fs/pipe-max-size", "r");
-
-    int pipe_max_size;
-
-    if (fd == NULL) {
-        // in case /proc/sys/fs/pipe-max-size is not readable (like in Android)
-        fprintf(stderr, "warning: cannot read /proc/sys/fs/pipe-max-size, setting pipe size to 8192\n");
-        pipe_max_size = 8192;
-    } else {
-        fscanf(fd, "%d", &pipe_max_size);
-    }
-
-    fcntl(1, F_SETPIPE_SZ, pipe_max_size);
-
-    size_t uwu_buf_len = (size_t) pipe_max_size;
-
-    char *uwu_buf = malloc(uwu_buf_len);
-    // mmap(NULL, uwu_buf_len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-
-    if (uwu_buf == NULL) {
-        fprintf(stderr, "error: out of memory\n");
-        free(data);
-        free(rng_buf);
-        return ENOMEM;
-    }
-
-    struct stat stat_buf;
-    int status = fstat(1, &stat_buf);
-
-    if (status == -1) {
-        fprintf(stderr, "error: %s", strerror(errno));
-        return errno;
-    }
-
-    bool is_pipe = stat_buf.st_mode == S_IFIFO;
-    struct iovec *vec;
-
-    if (is_pipe) {
-        vec = malloc(sizeof(struct iovec));
-
-        if (vec == NULL) {
-            fprintf(stderr, "error: out of memory\n");
-            free(uwu_buf);
-            free(data);
-            free(rng_buf);
-            return ENOMEM;
-        }
-
-        vec->iov_base = uwu_buf;
-        vec->iov_len = uwu_buf_len;
-    }
-
-    while (1) {
-        int result = write_chars(data, uwu_buf, uwu_buf_len);
-        if (result < 0) return result;
-
-        if (is_pipe) {
-            // It doesn't actually matter if we write to the buffer in the middle of a read,
-            // it's all nonsense anyway
-            vmsplice(1, vec, 1, SPLICE_F_GIFT);
-        } else {
-            write(1, uwu_buf, uwu_buf_len);
-        }
-    }
+	for (;;) {
+		char buf[BUFSIZ];
+		if (write_chars(&uwu, buf, BUFSIZ) < 0)
+			return 1;
+		write(STDOUT_FILENO, buf, BUFSIZ);
+	}
 }
