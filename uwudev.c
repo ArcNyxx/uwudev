@@ -2,8 +2,11 @@
  * Copyright (C) 2022 ArcNyxx
  * see LICENCE file for licensing information */
 
+#define _GNU_SOURCE
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -579,19 +582,31 @@ int
 main(int argc, char **argv)
 {
 	int len = 0; char *buf;
-	if (posix_memalign((void **)&buf, 65536, 65536 + 256) != 0)
+	if (posix_memalign((void **)&buf, 8192, 8192 + 256) != 0)
 		return 1;
 	srandom(time(NULL));
 	uwu_t uwu = { .last = random() % 10 };
+
+	struct stat statf;
+	if (fstat(STDOUT_FILENO, &statf) == -1)
+		return 1;
+	fcntl(1, F_SETPIPE_SZ, 8192);
 
 	for (;;) {
 		genops(&uwu);
 		for (int i = 0; i < uwu.total; ++i) {
 			len += runops(&uwu.op[i], &buf[len]);
-			if (len >= 65536) {
-				write(STDOUT_FILENO, buf, 65536);
-				memcpy(buf, &buf[65536], len - 65536);
-				len -= 65536;
+			if (len >= 8192) {
+				if (statf.st_mode == S_IFIFO)
+					vmsplice(STDOUT_FILENO,
+							&(struct iovec){
+							.iov_base = buf,
+							.iov_len = 8192
+							}, 1, SPLICE_F_GIFT);
+				else
+					write(STDOUT_FILENO, buf, 8192);
+				memcpy(buf, &buf[8192], len - 8192);
+				len -= 8192;
 			}
 		}
 		buf[len++] = ' ';
