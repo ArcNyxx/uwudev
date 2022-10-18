@@ -276,96 +276,115 @@ static const choice_t scrunk81[]  = { { 77,  3,    't' }, { 74,  4,    'm' } };
 static const choice_t scrunk82[]  = { { 91,  6,    'y' }, { 87,  7,    'e' } };
 static const choice_t scrunk83[]  = { { 112, 39,   '.' }, { 110, 72,   '!' },
 	          { 111, 100,  ',' } };
-static const choice_t scrunk84[]  = { { 158,  1,   's' } };
-static const choice_t scrunk85[]  = { { 169,  1,   ' ' } };
-static const choice_t scrunk86[]  = { { 11,  1,   's' } };
-static const choice_t scrunk87[]  = { { 52,  550,   ' ' }, { 53,  569,   '!' }, { 55,  586,   '.' }, { 54,  600,   ',' } };
-static const choice_t scrunk88[]  = { { 77,  3,   't' }, { 73,  4,   'k' }, { 78,  5,   'v' }, { 74,  6,   'm' } };
-static const choice_t scrunk89[]  = { { 117,  100,   'o' }, { 109,  150,   ' ' }, { 110,  169,   '!' }, { 111,  187,   ',' }, { 112,  200,   '.' } };
-static const choice_t scrunk90[]  = { { 157,  1,   'n' } };
-static const choice_t scrunk91[]  = { { 169,  300,   ' ' }, { 170,  373,   '!' }, { 172,  439,   '.' }, { 171,  500,   ',' } };
-static const choice_t scrunk92[]  = { { 12,  1,   't' } };
-static const choice_t scrunk93[]  = { { 42,  1,   'l' } };
-static const choice_t scrunk94[]  = { { 58,  1,   'o' } };
-static const choice_t scrunk95[]  = { { 76,  1,   'p' } };
-static const choice_t scrunk96[]  = { { 115,  1,   'l' } };
-static const choice_t scrunk97[]  = { { 151,  100,   'l' }, { 155,  200,   'y' }, { 146,  238,   '.' }, { 145,  273,   ',' }, { 144,  300,   '!' } };
-static const choice_t scrunk98[]  = { { 12,  2,   't' }, { 4,  3,   'f' } };
+static const choice_t scrunk84[]  = { { 158, 1,    's' } };
+static const choice_t scrunk85[]  = { { 169, 1,    ' ' } };
+static const choice_t scrunk86[]  = { { 11,  1,    's' } };
+static const choice_t scrunk87[]  = { { 52,  550,  ' ' }, { 53,  569,  '!' },
+	          { 55,  586,  '.' }, { 54,  600,  ',' } };
+static const choice_t scrunk88[]  = { { 77,  3,    't' }, { 73,  4,    'k' },
+	          { 78,  5,    'v' }, { 74,  6,    'm' } };
+static const choice_t scrunk89[]  = { { 117, 100,  'o' }, { 109, 150,  ' ' },
+	          { 110, 169,  '!' }, { 111, 187,  ',' }, { 112, 200,  '.' } };
+static const choice_t scrunk90[]  = { { 157, 1,    'n' } };
+static const choice_t scrunk91[]  = { { 169, 300,  ' ' }, { 170, 373,  '!' },
+	          { 172, 439,  '.' }, { 171, 500,  ',' } };
+static const choice_t scrunk92[]  = { { 12,  1,    't' } };
+static const choice_t scrunk93[]  = { { 42,  1,    'l' } };
+static const choice_t scrunk94[]  = { { 58,  1,    'o' } };
+static const choice_t scrunk95[]  = { { 76,  1,    'p' } };
+static const choice_t scrunk96[]  = { { 115, 1,    'l' } };
+static const choice_t scrunk97[]  = { { 151, 100,  'l' }, { 155, 200,  'y' },
+	          { 146, 238,  '.' }, { 145, 273,  ',' }, { 144, 300,  '!' } };
+static const choice_t scrunk98[]  = { { 12,  2,    't' }, { 4,   3,    'f' } };
 static const choice_t scrunk99[]  = { { 16,  26,   '!' }, { 15,  33,   ' ' } };
-static const choice_t scrunk100[] = { { 17,  1,   ',' } };
+static const choice_t scrunk100[] = { { 17,  1,    ',' } };
 static const choice_t scrunk101[] = { { 30,  25,   '.' }, { 29,  36,   ' ' } };
-static const choice_t scrunk102[] = { { 32,  1,   'l' } };
-static const choice_t scrunk103[] = { { 47,  1,   ' ' } };
-static const choice_t scrunk104[] = { { 60,  1,   ' ' } };
-static const choice_t scrunk105[] = { { 62,  1,   'e' }, { 63,  2,   'l' } };
-static const choice_t scrunk106[] = { { 82,  7,   'l' }, { 85,  9,   'y' }, { 84,  10,   'u' }, { 83,  11,   'o' } };
-static const choice_t scrunk107[] = { { 121,  1,   'w' } };
-static const choice_t scrunk108[] = { { 125,  1,   's' } };
-static const choice_t scrunk109[] = { { 0,  1,   'a' }, { 6,  2,   'i' }, { 8,  3,   'l' }, { 1,  4,   'b' }, { 9,  5,   'm' } };
-static const choice_t scrunk110[] = { { 16,  105,   '!' }, { 15,  136,   ' ' } };
-static const choice_t scrunk111[] = { { 17,  1,   ',' } };
-static const choice_t scrunk112[] = { { 30,  104,   '.' }, { 29,  141,   ' ' } };
-static const choice_t scrunk113[] = { { 75,  1,   'n' } };
-static const choice_t scrunk114[] = { { 81,  1,   'i' } };
-static const choice_t scrunk115[] = { { 86,  1,   ' ' } };
-static const choice_t scrunk116[] = { { 106,  1,   'k' } };
-static const choice_t scrunk117[] = { { 119,  300,   't' }, { 114,  500,   'k' }, { 117,  600,   'o' }, { 109,  700,   ' ' }, { 112,  776,   '.' }, { 110,  841,   '!' }, { 111,  900,   ',' } };
-static const choice_t scrunk118[] = { { 129,  1,   'n' } };
-static const choice_t scrunk119[] = { { 153,  1,   's' } };
-static const choice_t scrunk120[] = { { 156,  1,   'b' } };
-static const choice_t scrunk121[] = { { 161,  2,   ' ' }, { 167,  3,   'm' } };
-static const choice_t scrunk122[] = { { 10,  1,   'n' } };
-static const choice_t scrunk123[] = { { 127,  1,   'y' } };
-static const choice_t scrunk124[] = { { 130,  1,   'o' } };
-static const choice_t scrunk125[] = { { 142,  1,   'y' } };
-static const choice_t scrunk126[] = { { 157,  1,   'n' } };
-static const choice_t scrunk127[] = { { 169,  100,   ' ' }, { 170,  141,   '!' }, { 171,  177,   ',' }, { 172,  200,   '.' } };
-static const choice_t scrunk128[] = { { 75,  1,   'n' }, { 74,  2,   'm' } };
-static const choice_t scrunk129[] = { { 102,  1,   'a' } };
-static const choice_t scrunk130[] = { { 116,  1,   'n' }, { 113,  2,   'i' } };
-static const choice_t scrunk131[] = { { 157,  1,   'n' } };
-static const choice_t scrunk132[] = { { 16,  8,   '!' }, { 15,  11,   ' ' } };
-static const choice_t scrunk133[] = { { 17,  1,   ',' } };
+static const choice_t scrunk102[] = { { 32,  1,    'l' } };
+static const choice_t scrunk103[] = { { 47,  1,    ' ' } };
+static const choice_t scrunk104[] = { { 60,  1,    ' ' } };
+static const choice_t scrunk105[] = { { 62,  1,    'e' }, { 63,  2,    'l' } };
+static const choice_t scrunk106[] = { { 82,  7,    'l' }, { 85,  9,    'y' },
+	          { 84,  10,   'u' }, { 83,  11,   'o' } };
+static const choice_t scrunk107[] = { { 121, 1,    'w' } };
+static const choice_t scrunk108[] = { { 125, 1,    's' } };
+static const choice_t scrunk109[] = { { 0,   1,    'a' }, { 6,   2,    'i' },
+	          { 8,   3,    'l' }, { 1,   4,    'b' }, { 9,   5,    'm' } };
+static const choice_t scrunk110[] = { { 16,  105,  '!' }, { 15,  136,  ' ' } };
+static const choice_t scrunk111[] = { { 17,  1,    ',' } };
+static const choice_t scrunk112[] = { { 30,  104,  '.' }, { 29,  141,  ' ' } };
+static const choice_t scrunk113[] = { { 75,  1,    'n' } };
+static const choice_t scrunk114[] = { { 81,  1,    'i' } };
+static const choice_t scrunk115[] = { { 86,  1,    ' ' } };
+static const choice_t scrunk116[] = { { 106, 1,    'k' } };
+static const choice_t scrunk117[] = { { 119, 300,  't' }, { 114, 500,  'k' },
+	          { 117, 600,  'o' }, { 109, 700,  ' ' }, { 112, 776,  '.' },
+		  { 110, 841,  '!' }, { 111, 900,  ',' } };
+static const choice_t scrunk118[] = { { 129, 1,    'n' } };
+static const choice_t scrunk119[] = { { 153, 1,    's' } };
+static const choice_t scrunk120[] = { { 156, 1,    'b' } };
+static const choice_t scrunk121[] = { { 161, 2,    ' ' }, { 167,  3,   'm' } };
+static const choice_t scrunk122[] = { { 10,  1,    'n' } };
+static const choice_t scrunk123[] = { { 127, 1,    'y' } };
+static const choice_t scrunk124[] = { { 130, 1,    'o' } };
+static const choice_t scrunk125[] = { { 142, 1,    'y' } };
+static const choice_t scrunk126[] = { { 157, 1,    'n' } };
+static const choice_t scrunk127[] = { { 169, 100,  ' ' }, { 170, 141,  '!' },
+	          { 171, 177,  ',' }, { 172, 200,  '.' } };
+static const choice_t scrunk128[] = { { 75,  1,    'n' }, { 74,  2,    'm' } };
+static const choice_t scrunk129[] = { { 102, 1,    'a' } };
+static const choice_t scrunk130[] = { { 116, 1,    'n' }, { 113, 2,    'i' } };
+static const choice_t scrunk131[] = { { 157, 1,    'n' } };
+static const choice_t scrunk132[] = { { 16,  8,    '!' }, { 15,  11,   ' ' } };
+static const choice_t scrunk133[] = { { 17,  1,    ',' } };
 static const choice_t scrunk134[] = { { 30,  13,   '.' }, { 29,  17,   ' ' } };
-static const choice_t scrunk135[] = { { 45,  1,   'r' } };
-static const choice_t scrunk136[] = { { 66,  1,   'r' } };
-static const choice_t scrunk137[] = { { 77,  2,   't' }, { 72,  3,   'e' } };
-static const choice_t scrunk138[] = { { 96,  1,   'o' } };
-static const choice_t scrunk139[] = { { 109,  2,   ' ' }, { 117,  3,   'o' } };
-static const choice_t scrunk140[] = { { 126,  2,   'u' }, { 124,  3,   'r' } };
-static const choice_t scrunk141[] = { { 143,  1,   ' ' } };
-static const choice_t scrunk142[] = { { 169,  300,   ' ' }, { 172,  341,   '.' }, { 171,  376,   ',' }, { 170,  400,   '!' } };
-static const choice_t scrunk143[] = { { 12,  2,   't' }, { 0,  4,   'a' }, { 2,  5,   'c' }, { 11,  6,   's' } };
-static const choice_t scrunk144[] = { { 16,  85,   '!' }, { 15,  122,   ' ' } };
-static const choice_t scrunk145[] = { { 17,  1,   ',' } };
-static const choice_t scrunk146[] = { { 30,  101,   '.' }, { 29,  144,   ' ' } };
-static const choice_t scrunk147[] = { { 35,  1,   'p' } };
-static const choice_t scrunk148[] = { { 59,  200,   's' }, { 53,  238,   '!' }, { 55,  271,   '.' }, { 54,  300,   ',' } };
-static const choice_t scrunk149[] = { { 65,  1,   'e' } };
-static const choice_t scrunk150[] = { { 72,  1,   'e' } };
-static const choice_t scrunk151[] = { { 87,  1,   'e' } };
-static const choice_t scrunk152[] = { { 117, 3,   'o' }, { 109,  4,   ' ' } };
-static const choice_t scrunk153[] = { { 137, 1,   'i' } };
-static const choice_t scrunk154[] = { { 151, 1,   'l' } };
-static const choice_t scrunk155[] = { { 169, 100,   ' ' }, { 171,  138,   ',' }, { 170,  169,   '!' }, { 172,  200,   '.' } };
-static const choice_t scrunk156[] = { { 42,  1,   'l' } };
-static const choice_t scrunk157[] = { { 106, 4,   'k' }, { 105,  7,   'g' }, { 104,  8,   'f' } };
-static const choice_t scrunk158[] = { { 134, 34,   '.' }, { 132,  67,   '!' }, { 133,  100,   ',' } };
-static const choice_t scrunk159[] = { { 148, 1,   'e' } };
-static const choice_t scrunk160[] = { { 52,  1,   ' ' } };
-static const choice_t scrunk161[] = { { 12,  2,   't' }, { 8,  3,   'l' }, { 11,  4,   's' }, { 13,  5,   'w' }, { 6,  6,   'i' } };
-static const choice_t scrunk162[] = { { 16,   24,   '!' }, { 15,   43,   ' ' } };
-static const choice_t scrunk163[] = { { 17,   1,   ',' } };
-static const choice_t scrunk164[] = { { 30,   4,   '.' }, { 29,   5,   ' ' } };
-static const choice_t scrunk165[] = { { 65,   1,   'e' } };
-static const choice_t scrunk166[] = { { 71,   1,   'd' } };
-static const choice_t scrunk167[] = { { 94,   1,   'e' } };
-static const choice_t scrunk168[] = { { 161,   3,   ' ' }, { 168,   5,   'w' } };
-static const choice_t scrunk169[] = { { 12,   2,   't' }, { 11,   4,   's' }, { 3,   6,   'd' }, { 0,   8,   'a' }, { 7,   9,   'k' }, { 13,   10,   'w' } };
-static const choice_t scrunk170[] = { { 16,   5,   '!' }, { 15,   7,   ' ' } };
-static const choice_t scrunk171[] = { { 17,   1,   ',' } };
-static const choice_t scrunk172[] = { { 30,   51,   '.' }, { 29,   65,   ' ' } };
-static const choice_t scrunk173[] = { { 38,   1,   'y' } };
+static const choice_t scrunk135[] = { { 45,  1,    'r' } };
+static const choice_t scrunk136[] = { { 66,  1,    'r' } };
+static const choice_t scrunk137[] = { { 77,  2,    't' }, { 72,  3,    'e' } };
+static const choice_t scrunk138[] = { { 96,  1,    'o' } };
+static const choice_t scrunk139[] = { { 109, 2,    ' ' }, { 117, 3,    'o' } };
+static const choice_t scrunk140[] = { { 126, 2,    'u' }, { 124, 3,    'r' } };
+static const choice_t scrunk141[] = { { 143, 1,    ' ' } };
+static const choice_t scrunk142[] = { { 169, 300,  ' ' }, { 172, 341,  '.' },
+	          { 171, 376,  ',' }, { 170, 400,  '!' } };
+static const choice_t scrunk143[] = { { 12,  2,    't' }, { 0,   4,    'a' },
+	          { 2,   5,    'c' }, { 11,  6,    's' } };
+static const choice_t scrunk144[] = { { 16,  85,   '!' }, { 15,  122,  ' ' } };
+static const choice_t scrunk145[] = { { 17,  1,    ',' } };
+static const choice_t scrunk146[] = { { 30,  101,  '.' }, { 29,  144,  ' ' } };
+static const choice_t scrunk147[] = { { 35,  1,    'p' } };
+static const choice_t scrunk148[] = { { 59,  200,  's' }, { 53,  238,  '!' },
+	          { 55,  271,  '.' }, { 54,  300,  ',' } };
+static const choice_t scrunk149[] = { { 65,  1,    'e' } };
+static const choice_t scrunk150[] = { { 72,  1,    'e' } };
+static const choice_t scrunk151[] = { { 87,  1,    'e' } };
+static const choice_t scrunk152[] = { { 117, 3,    'o' }, { 109, 4,    ' ' } };
+static const choice_t scrunk153[] = { { 137, 1,    'i' } };
+static const choice_t scrunk154[] = { { 151, 1,    'l' } };
+static const choice_t scrunk155[] = { { 169, 100,  ' ' }, { 171, 138,  ',' },
+	          { 170, 169,  '!' }, { 172, 200,  '.' } };
+static const choice_t scrunk156[] = { { 42,  1,    'l' } };
+static const choice_t scrunk157[] = { { 106, 4,    'k' }, { 105, 7,    'g' },
+		  { 104, 8,    'f' } };
+static const choice_t scrunk158[] = { { 134, 34,   '.' }, { 132, 67,   '!' },
+	          { 133, 100,  ',' } };
+static const choice_t scrunk159[] = { { 148, 1,    'e' } };
+static const choice_t scrunk160[] = { { 52,  1,    ' ' } };
+static const choice_t scrunk161[] = { { 12,  2,    't' }, { 8,   3,    'l' },
+	          { 11,  4,    's' }, { 13,  5,    'w' }, { 6,   6,    'i' } };
+static const choice_t scrunk162[] = { { 16,  24,   '!' }, { 15,  43,   ' ' } };
+static const choice_t scrunk163[] = { { 17,  1,    ',' } };
+static const choice_t scrunk164[] = { { 30,  4,    '.' }, { 29,  5,    ' ' } };
+static const choice_t scrunk165[] = { { 65,  1,    'e' } };
+static const choice_t scrunk166[] = { { 71,  1,    'd' } };
+static const choice_t scrunk167[] = { { 94,  1,    'e' } };
+static const choice_t scrunk168[] = { { 161, 3,    ' ' }, { 168, 5,    'w' } };
+static const choice_t scrunk169[] = { { 12,  2,    't' }, { 11,  4,    's' },
+	          { 3,   6,    'd' }, { 0,   8,    'a' }, { 7,   9,    'k' },
+		  { 13,  10,   'w' } };
+static const choice_t scrunk170[] = { { 16,  5,    '!' }, { 15,  7,    ' ' } };
+static const choice_t scrunk171[] = { { 17,  1,    ',' } };
+static const choice_t scrunk172[] = { { 30,  51,   '.' }, { 29,  65,   ' ' } };
+static const choice_t scrunk173[] = { { 38,  1,    'y' } };
 
 static const ngram_t scrunk[] = {
         { scrunk0,   1067 }, /* a  */ { scrunk1,   1    }, /* b  */
