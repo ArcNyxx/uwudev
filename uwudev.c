@@ -20,6 +20,42 @@ typedef struct ngram {
 	const int prob;
 } ngram_t;
 
+typedef struct str {
+	const char *str;
+	const int len;
+} str_t;
+
+typedef struct repeat {
+	int times;
+	char ch;
+} repeat_t;
+
+typedef enum opcode {
+	OP_NULL, OP_NGRAM, OP_STR, OP_REPEAT
+} opcode_t;
+
+typedef struct oper {
+	union {
+		struct {
+			const ngram_t *ngram;
+			int prev;
+		};
+		const char *str;
+		char ch;
+	};
+
+	opcode_t op;
+	int len;
+} oper_t;
+
+typedef struct uwu {
+	oper_t op[3];
+	int total, last;
+} uwu_t;
+
+static int runops(oper_t *op, char *buf);
+static void genops(uwu_t *uwu);
+
 static const choice_t catnoise0[]   = { { 0,  2,  'a' }, { 1,  3,  'm' } };
 static const choice_t catnoise1[]   = { { 7,  3,  'r' }, { 6,  4,  'e' } };
 static const choice_t catnoise2[]   = { { 8,  1,  'y' } };
@@ -123,52 +159,49 @@ static const ngram_t keysmash[] = {
 };
 
 static const choice_t scrunkle0[]   = { { 34,  500,  'n' }, { 37,  867,  'w' },
-				        { 31,  1067, 'd' } };
+{ 31,  1067, 'd' } };
 static const choice_t scrunkle1[]   = { { 43,  1,    'o' } };
 static const choice_t scrunkle2[]   = { { 46,  60,   'u' }, { 45,  107,  'r' },
-	 				{ 44,  147,  'a' } };
+{ 44,  147,  'a' } };
 static const choice_t scrunkle3[]   = { { 51,  1,    'o' } };
 static const choice_t scrunkle4[]   = { { 61,  1,    'l' } };
 static const choice_t scrunkle5[]   = { { 64,  1,    'a' } };
 static const choice_t scrunkle6[]   = { { 77,  200,  't' }, { 70,  300,  'c' },
-					{ 68,  325,  ',' }, { 67,  349,  '!' },
-					{ 69,  364,  '.' } };
+{ 68,  325,  ',' }, { 67,  349,  '!' }, { 69,  364,  '.' } };
 static const choice_t scrunkle7[]   = { { 81,  2,    'i' }, { 79,  3,    'd' } };
 static const choice_t scrunkle8[]   = { { 88,  4,    'i' }, { 89,  5,    'o' } };
 static const choice_t scrunkle9[]   = { { 95,  1,    'i' }, { 94,  2,    'e' } };
 static const choice_t scrunkle10[]  = { { 107, 50,   'o' }, { 98,  81,   ' ' } };
 static const choice_t scrunkle11[]  = { { 135, 535,  'c' }, { 140, 835,  'p' },
-					{ 139, 1100, 'o' }, { 138, 1200, 'm' },
-					{ 136, 1271, 'h' } };
+{ 139, 1100, 'o' }, { 138, 1200, 'm' }, { 136, 1271, 'h' } };
 static const choice_t scrunkle12[]  = { { 149, 262,  'h' }, { 152, 362,  'o' },
-					{ 150, 453,  'i' }, { 147, 478,  'a' } };
+{ 150, 453,  'i' }, { 147, 478,  'a' } };
 static const choice_t scrunkle13[]  = { { 165, 11,   'h' }, { 166, 19,   'i' } };
 static const choice_t scrunkle14[]  = { { 173, 1,    'a' } };
 static const choice_t scrunkle15[]  = { { 12,  190,  't' }, { 0,   326,  'a' },
-					{ 11,  454,  's' }, { 8,   572,  'l' },
-					{ 2,   646,  'c' }, { 14,  684,  'y' },
-					{ 5,   722,  'h' }, { 13,  757,  'w' },
-					{ 1,   790,  'b' }, { 10,  821,  'n' },
-					{ 6,   849,  'i' } };
+{ 11,  454,  's' }, { 8,   572,  'l' }, { 2,   646,  'c' }, { 14,  684,  'y' },
+{ 5,   722,  'h' }, { 13,  757,  'w' }, { 1,   790,  'b' }, { 10,  821,  'n' },
+{ 6,   849,  'i' } };
 static const choice_t scrunkle16[]  = { { 15,  31,   ' ' }, { 16,  60,   '!' } };
 static const choice_t scrunkle17[]  = { { 17,  777,  ',' }, { 26,  965,  't' },
-					{ 18,  1098, 'a' }, { 25,  1227, 's' },
-					{ 23,  1322, 'l' }, { 20,  1387, 'c' },
-					{ 24,  1425, 'n' }, { 28,  1462, 'y' },
-					{ 22,  1498, 'i' }, { 19,  1531, 'b' },
-					{ 21,  1560, 'h' }, { 27,  1585, 'w' } };
+{ 18,  1098, 'a' }, { 25,  1227, 's' }, { 23,  1322, 'l' }, { 20,  1387, 'c' },
+{ 24,  1425, 'n' }, { 28,  1462, 'y' }, { 22,  1498, 'i' }, { 19,  1531, 'b' },
+{ 21,  1560, 'h' }, { 27,  1585, 'w' } };
 static const choice_t scrunkle18[]  = { { 37,  1,    'w' } };
 static const choice_t scrunkle19[]  = { { 43,  1,    'o' } };
 static const choice_t scrunkle20[]  = { { 45,  1,    'r' } };
 static const choice_t scrunkle21[]  = { { 64,  1,    'a' } };
-static const choice_t scrunkle22[]  = { { 67,  7,    '!' }, { 68,  13,   ',' }, { 69,  18,   '.' } };
+static const choice_t scrunkle22[]  = { { 67,  7,    '!' }, { 68,  13,   ',' },
+					{ 69,  18,   '.' } };
 static const choice_t scrunkle23[]  = { { 89,  59,   'o' }, { 88,  95,   'i' } };
-static const choice_t scrunkle24[]  = { { 98,  1,   ' ' } };
-static const choice_t scrunkle25[]  = { { 135,  65,   'c' }, { 139,  100,   'o' }, { 136,  129,   'h' } };
-static const choice_t scrunkle26[]  = { { 149,  38,   'h' }, { 150,  47,   'i' } };
-static const choice_t scrunkle27[]  = { { 165,  1,   'h' } };
-static const choice_t scrunkle28[]  = { { 173,  1,   'a' } };
-static const choice_t scrunkle29[]  = { { 12,  222,   't' }, { 11,  365,   's' }, { 0,  496,   'a' }, { 8,  583,   'l' }, { 2,  644,   'c' }, { 13,  684,   'w' }, { 6,  720,   'i' }, { 1,  754,   'b' }, { 5,  787,   'h' }, { 10,  818,   'n' }, { 14,  843,   'y' } };
+static const choice_t scrunkle24[]  = { { 98,  1,    ' ' } };
+static const choice_t scrunkle25[]  = { { 135, 65,   'c' }, { 139, 100,  'o' },
+	{ 136, 129,  'h' } };
+static const choice_t scrunkle26[]  = { { 149, 38,   'h' }, { 150, 47,   'i' } };
+static const choice_t scrunkle27[]  = { { 165, 1,    'h' } };
+static const choice_t scrunkle28[]  = { { 173, 1,    'a' } };
+static const choice_t scrunkle29[]  = { { 12,  222,  't' }, { 11,  365,  's' },
+					{ 0,   496,   'a' }, { 8,  583,   'l' }, { 2,  644,   'c' }, { 13,  684,   'w' }, { 6,  720,   'i' }, { 1,  754,   'b' }, { 5,  787,   'h' }, { 10,  818,   'n' }, { 14,  843,   'y' } };
 static const choice_t scrunkle30[]  = { { 29,  638,   ' ' }, { 30,  1271,   '.' } };
 static const choice_t scrunkle31[]  = { { 51,  1,   'o' } };
 static const choice_t scrunkle32[]  = { { 87,  1,   'e' } };
@@ -315,99 +348,94 @@ static const choice_t scrunkle172[] = { { 30,   51,   '.' }, { 29,   65,   ' ' }
 static const choice_t scrunkle173[] = { { 38,   1,   'y' } };
 
 static const ngram_t scrunkle[] = {
-        { scrunkle0,   1067       }, /* a */ { scrunkle1,   1       }, /* b */
-        { scrunkle2,   147       }, /* c */ { scrunkle3,   1       }, /* d */
-        { scrunkle4,   1       }, /* f */ { scrunkle5,   1       }, /* h */
-        { scrunkle6,   364       }, /* i */ { scrunkle7,   3       }, /* k */
-        { scrunkle8,   5       }, /* l */ { scrunkle9,   2       }, /* m */
-        { scrunkle10,  81       }, /* n */ { scrunkle11,  1271       }, /* s */
-        { scrunkle12,  478       }, /* t */ { scrunkle13,  19       }, /* w */
-        { scrunkle14,  1       }, /* y */ { scrunkle15,  849       }, /* ! */
-        { scrunkle16,  60       }, /* !! */ { scrunkle17,  1585       }, /* ,, */
-        { scrunkle18,  1       }, /* ,a */ { scrunkle19,  1       }, /* ,b */
-        { scrunkle20,  1       }, /* ,c */ { scrunkle21,  1       }, /* ,h */
-        { scrunkle22,  18       }, /* ,i */ { scrunkle23,  95       }, /* ,l */
-        { scrunkle24,  1       }, /* ,n */ { scrunkle25,  129       }, /* ,s */
-        { scrunkle26,  47       }, /* ,t */ { scrunkle27,  1       }, /* ,w */
-        { scrunkle28,  1       }, /* ,y */ { scrunkle29,  843       }, /* . */
-        { scrunkle30,  1271       }, /* .. */ { scrunkle31,  1       }, /* ad */
-        { scrunkle32,  1       }, /* al */ { scrunkle33,  1       }, /* am */
-        { scrunkle34,  6       }, /* an */ { scrunkle35,  2       }, /* ap */
-        { scrunkle36,  1       }, /* at */ { scrunkle37,  500       }, /* aw */
-        { scrunkle38,  50       }, /* ay */ { scrunkle39,  33       }, /* b! */
-        { scrunkle40,  1       }, /* b, */ { scrunkle41,  9       }, /* b. */
-        { scrunkle42,  3       }, /* bl */ { scrunkle43,  1       }, /* bo */
-        { scrunkle44,  3       }, /* ca */ { scrunkle45,  9       }, /* cr */
-        { scrunkle46,  1       }, /* cu */ { scrunkle47,  5       }, /* d */
-        { scrunkle48,  100       }, /* db */ { scrunkle49,  1       }, /* dd */
-        { scrunkle50,  1       }, /* dl */ { scrunkle51,  5       }, /* do */
-        { scrunkle52,  25       }, /* e */ { scrunkle53,  208       }, /* e! */
-        { scrunkle54,  1       }, /* e, */ { scrunkle55,  101       }, /* e. */
-        { scrunkle56,  1       }, /* em */ { scrunkle57,  600       }, /* en */
-        { scrunkle58,  1       }, /* eo */ { scrunkle59,  1       }, /* es */
-        { scrunkle60,  1       }, /* f */ { scrunkle61,  1       }, /* fl */
-        { scrunkle62,  200       }, /* ge */ { scrunkle63,  1       }, /* gl */
-        { scrunkle64,  1       }, /* ha */ { scrunkle65,  1600       }, /* he */
-        { scrunkle66,  1       }, /* hr */ { scrunkle67,  38       }, /* i! */
-        { scrunkle68,  1       }, /* i, */ { scrunkle69,  25       }, /* i. */
-        { scrunkle70,  1       }, /* ic */ { scrunkle71,  1       }, /* id */
-        { scrunkle72,  500       }, /* ie */ { scrunkle73,  1       }, /* ik */
-        { scrunkle74,  2       }, /* im */ { scrunkle75,  7       }, /* in */
-        { scrunkle76,  1       }, /* ip */ { scrunkle77,  1000       }, /* it */
-        { scrunkle78,  1       }, /* iv */ { scrunkle79,  1       }, /* kd */
-        { scrunkle80,  1       }, /* ke */ { scrunkle81,  4       }, /* ki */
-        { scrunkle82,  7       }, /* kl */ { scrunkle83,  100       }, /* ko */
-        { scrunkle84,  1       }, /* ku */ { scrunkle85,  1       }, /* ky */
-        { scrunkle86,  1       }, /* l */ { scrunkle87,  600       }, /* le */
-        { scrunkle88,  6       }, /* li */ { scrunkle89,  200       }, /* lo */
-        { scrunkle90,  1       }, /* lu */ { scrunkle91,  500       }, /* ly */
-        { scrunkle92,  1       }, /* m */ { scrunkle93,  1       }, /* mb */
-        { scrunkle94,  1       }, /* me */ { scrunkle95,  1       }, /* mi */
-        { scrunkle96,  1       }, /* mo */ { scrunkle97,  300       }, /* mt */
-        { scrunkle98,  3       }, /* n */ { scrunkle99,  33       }, /* n! */
-        { scrunkle100, 1       }, /* n, */ { scrunkle101, 36       }, /* n. */
-        { scrunkle102, 1       }, /* na */ { scrunkle103, 1       }, /* nd */
-        { scrunkle104, 1       }, /* nf */ { scrunkle105, 2       }, /* ng */
-        { scrunkle106, 11       }, /* nk */ { scrunkle107, 1       }, /* no */
-        { scrunkle108, 1       }, /* np */ { scrunkle109, 5       }, /* o */
-        { scrunkle110, 136       }, /* o! */ { scrunkle111, 1       }, /* o, */
-        { scrunkle112, 141       }, /* o. */ { scrunkle113, 1       }, /* oi */
-        { scrunkle114, 1       }, /* ok */ { scrunkle115, 1       }, /* ol */
-        { scrunkle116, 1       }, /* on */ { scrunkle117, 900       }, /* oo */
-        { scrunkle118, 1       }, /* or */ { scrunkle119, 1       }, /* ot */
-        { scrunkle120, 1       }, /* ou */ { scrunkle121, 3       }, /* ow */
-        { scrunkle122, 1       }, /* p */ { scrunkle123, 1       }, /* pp */
-        { scrunkle124, 1       }, /* pr */ { scrunkle125, 1       }, /* ps */
-        { scrunkle126, 1       }, /* pu */ { scrunkle127, 200       }, /* py */
-        { scrunkle128, 2       }, /* ri */ { scrunkle129, 1       }, /* rn */
-        { scrunkle130, 2       }, /* ro */ { scrunkle131, 1       }, /* ru */
-        { scrunkle132, 11       }, /* s! */ { scrunkle133, 1       }, /* s, */
-        { scrunkle134, 17       }, /* s. */ { scrunkle135, 1       }, /* sc */
-        { scrunkle136, 1       }, /* sh */ { scrunkle137, 3       }, /* si */
-        { scrunkle138, 1       }, /* sm */ { scrunkle139, 3       }, /* so */
-        { scrunkle140, 3       }, /* sp */ { scrunkle141, 1       }, /* st */
-        { scrunkle142, 400       }, /* sy */ { scrunkle143, 6       }, /* t */
-        { scrunkle144, 122       }, /* t! */ { scrunkle145, 1       }, /* t, */
-        { scrunkle146, 144       }, /* t. */ { scrunkle147, 1       }, /* ta */
-        { scrunkle148, 300       }, /* te */ { scrunkle149, 1       }, /* th */
-        { scrunkle150, 1       }, /* ti */ { scrunkle151, 1       }, /* tl */
-        { scrunkle152, 4       }, /* to */ { scrunkle153, 1       }, /* ts */
-        { scrunkle154, 1       }, /* tt */ { scrunkle155, 200       }, /* ty */
-        { scrunkle156, 1       }, /* ub */ { scrunkle157, 8       }, /* un */
-        { scrunkle158, 100       }, /* us */ { scrunkle159, 1       }, /* ut */
-        { scrunkle160, 1       }, /* ve */ { scrunkle161, 6       }, /* w */
-        { scrunkle162, 43       }, /* w! */ { scrunkle163, 1       }, /* w, */
-        { scrunkle164, 5       }, /* w. */ { scrunkle165, 1       }, /* wh */
-        { scrunkle166, 1       }, /* wi */ { scrunkle167, 1       }, /* wm */
-        { scrunkle168, 5       }, /* ww */ { scrunkle169, 10       }, /* y */
-        { scrunkle170, 7       }, /* y! */ { scrunkle171, 1       }, /* y, */
-        { scrunkle172, 65       }, /* y. */ { scrunkle173, 1       }   /* ya */
+        { scrunkle0,   1067 }, /* a  */ { scrunkle1,   1    }, /* b  */
+        { scrunkle2,   147  }, /* c  */ { scrunkle3,   1    }, /* d  */
+        { scrunkle4,   1    }, /* f  */ { scrunkle5,   1    }, /* h  */
+        { scrunkle6,   364  }, /* i  */ { scrunkle7,   3    }, /* k  */
+        { scrunkle8,   5    }, /* l  */ { scrunkle9,   2    }, /* m  */
+        { scrunkle10,  81   }, /* n  */ { scrunkle11,  1271 }, /* s  */
+        { scrunkle12,  478  }, /* t  */ { scrunkle13,  19   }, /* w  */
+        { scrunkle14,  1    }, /* y  */ { scrunkle15,  849  }, /* !  */
+        { scrunkle16,  60   }, /* !! */ { scrunkle17,  1585 }, /* ,, */
+        { scrunkle18,  1    }, /* ,a */ { scrunkle19,  1    }, /* ,b */
+        { scrunkle20,  1    }, /* ,c */ { scrunkle21,  1    }, /* ,h */
+        { scrunkle22,  18   }, /* ,i */ { scrunkle23,  95   }, /* ,l */
+        { scrunkle24,  1    }, /* ,n */ { scrunkle25,  129  }, /* ,s */
+        { scrunkle26,  47   }, /* ,t */ { scrunkle27,  1    }, /* ,w */
+        { scrunkle28,  1    }, /* ,y */ { scrunkle29,  843  }, /* .  */
+        { scrunkle30,  1271 }, /* .. */ { scrunkle31,  1    }, /* ad */
+        { scrunkle32,  1    }, /* al */ { scrunkle33,  1    }, /* am */
+        { scrunkle34,  6    }, /* an */ { scrunkle35,  2    }, /* ap */
+        { scrunkle36,  1    }, /* at */ { scrunkle37,  500  }, /* aw */
+        { scrunkle38,  50   }, /* ay */ { scrunkle39,  33   }, /* b! */
+        { scrunkle40,  1    }, /* b, */ { scrunkle41,  9    }, /* b. */
+        { scrunkle42,  3    }, /* bl */ { scrunkle43,  1    }, /* bo */
+        { scrunkle44,  3    }, /* ca */ { scrunkle45,  9    }, /* cr */
+        { scrunkle46,  1    }, /* cu */ { scrunkle47,  5    }, /* d  */
+        { scrunkle48,  100  }, /* db */ { scrunkle49,  1    }, /* dd */
+        { scrunkle50,  1    }, /* dl */ { scrunkle51,  5    }, /* do */
+        { scrunkle52,  25   }, /* e  */ { scrunkle53,  208  }, /* e! */
+        { scrunkle54,  1    }, /* e, */ { scrunkle55,  101  }, /* e. */
+        { scrunkle56,  1    }, /* em */ { scrunkle57,  600  }, /* en */
+        { scrunkle58,  1    }, /* eo */ { scrunkle59,  1    }, /* es */
+        { scrunkle60,  1    }, /* f  */ { scrunkle61,  1    }, /* fl */
+        { scrunkle62,  200  }, /* ge */ { scrunkle63,  1    }, /* gl */
+        { scrunkle64,  1    }, /* ha */ { scrunkle65,  1600 }, /* he */
+        { scrunkle66,  1    }, /* hr */ { scrunkle67,  38   }, /* i! */
+        { scrunkle68,  1    }, /* i, */ { scrunkle69,  25   }, /* i. */
+        { scrunkle70,  1    }, /* ic */ { scrunkle71,  1    }, /* id */
+        { scrunkle72,  500  }, /* ie */ { scrunkle73,  1    }, /* ik */
+        { scrunkle74,  2    }, /* im */ { scrunkle75,  7    }, /* in */
+        { scrunkle76,  1    }, /* ip */ { scrunkle77,  1000 }, /* it */
+        { scrunkle78,  1    }, /* iv */ { scrunkle79,  1    }, /* kd */
+        { scrunkle80,  1    }, /* ke */ { scrunkle81,  4    }, /* ki */
+        { scrunkle82,  7    }, /* kl */ { scrunkle83,  100  }, /* ko */
+        { scrunkle84,  1    }, /* ku */ { scrunkle85,  1    }, /* ky */
+        { scrunkle86,  1    }, /* l  */ { scrunkle87,  600  }, /* le */
+        { scrunkle88,  6    }, /* li */ { scrunkle89,  200  }, /* lo */
+        { scrunkle90,  1    }, /* lu */ { scrunkle91,  500  }, /* ly */
+        { scrunkle92,  1    }, /* m  */ { scrunkle93,  1    }, /* mb */
+        { scrunkle94,  1    }, /* me */ { scrunkle95,  1    }, /* mi */
+        { scrunkle96,  1    }, /* mo */ { scrunkle97,  300  }, /* mt */
+        { scrunkle98,  3    }, /* n  */ { scrunkle99,  33   }, /* n! */
+        { scrunkle100, 1    }, /* n, */ { scrunkle101, 36   }, /* n. */
+        { scrunkle102, 1    }, /* na */ { scrunkle103, 1    }, /* nd */
+        { scrunkle104, 1    }, /* nf */ { scrunkle105, 2    }, /* ng */
+        { scrunkle106, 11   }, /* nk */ { scrunkle107, 1    }, /* no */
+        { scrunkle108, 1    }, /* np */ { scrunkle109, 5    }, /* o  */
+        { scrunkle110, 136  }, /* o! */ { scrunkle111, 1    }, /* o, */
+        { scrunkle112, 141  }, /* o. */ { scrunkle113, 1    }, /* oi */
+        { scrunkle114, 1    }, /* ok */ { scrunkle115, 1    }, /* ol */
+        { scrunkle116, 1    }, /* on */ { scrunkle117, 900  }, /* oo */
+        { scrunkle118, 1    }, /* or */ { scrunkle119, 1    }, /* ot */
+        { scrunkle120, 1    }, /* ou */ { scrunkle121, 3    }, /* ow */
+        { scrunkle122, 1    }, /* p  */ { scrunkle123, 1    }, /* pp */
+        { scrunkle124, 1    }, /* pr */ { scrunkle125, 1    }, /* ps */
+        { scrunkle126, 1    }, /* pu */ { scrunkle127, 200  }, /* py */
+        { scrunkle128, 2    }, /* ri */ { scrunkle129, 1    }, /* rn */
+        { scrunkle130, 2    }, /* ro */ { scrunkle131, 1    }, /* ru */
+        { scrunkle132, 11   }, /* s! */ { scrunkle133, 1    }, /* s, */
+        { scrunkle134, 17   }, /* s. */ { scrunkle135, 1    }, /* sc */
+        { scrunkle136, 1    }, /* sh */ { scrunkle137, 3    }, /* si */
+        { scrunkle138, 1    }, /* sm */ { scrunkle139, 3    }, /* so */
+        { scrunkle140, 3    }, /* sp */ { scrunkle141, 1    }, /* st */
+        { scrunkle142, 400  }, /* sy */ { scrunkle143, 6    }, /* t  */
+        { scrunkle144, 122  }, /* t! */ { scrunkle145, 1    }, /* t, */
+        { scrunkle146, 144  }, /* t. */ { scrunkle147, 1    }, /* ta */
+        { scrunkle148, 300  }, /* te */ { scrunkle149, 1    }, /* th */
+        { scrunkle150, 1    }, /* ti */ { scrunkle151, 1    }, /* tl */
+        { scrunkle152, 4    }, /* to */ { scrunkle153, 1    }, /* ts */
+        { scrunkle154, 1    }, /* tt */ { scrunkle155, 200  }, /* ty */
+        { scrunkle156, 1    }, /* ub */ { scrunkle157, 8    }, /* un */
+        { scrunkle158, 100  }, /* us */ { scrunkle159, 1    }, /* ut */
+        { scrunkle160, 1    }, /* ve */ { scrunkle161, 6    }, /* w  */
+        { scrunkle162, 43   }, /* w! */ { scrunkle163, 1    }, /* w, */
+        { scrunkle164, 5    }, /* w. */ { scrunkle165, 1    }, /* wh */
+        { scrunkle166, 1    }, /* wi */ { scrunkle167, 1    }, /* wm */
+        { scrunkle168, 5    }, /* ww */ { scrunkle169, 10   }, /* y  */
+        { scrunkle170, 7    }, /* y! */ { scrunkle171, 1    }, /* y, */
+        { scrunkle172, 65   }, /* y. */ { scrunkle173, 1    }  /* ya */
 };
-
-typedef struct str {
-	char *str;
-	int len;
-} str_t;
 
 const str_t strs[] = {
 	STRLIT("*tilts head*"),             STRLIT("*twitches ears slightly*"),
@@ -418,34 +446,6 @@ const str_t strs[] = {
 	STRLIT("*lies down on a surface*"), STRLIT("*claws the air*"),
 	STRLIT("*points towards case of monster zero ultra*")
 };
-
-typedef struct repeat {
-	int times;
-	char ch;
-} repeat_t;
-
-typedef enum opcode {
-	OP_NULL, OP_NGRAM, OP_STR, OP_REPEAT
-} opcode_t;
-
-typedef struct oper {
-	union {
-		struct {
-			const ngram_t *ngram;
-			int prev;
-		};
-		char *str;
-		char ch;
-	};
-
-	opcode_t op;
-	int len;
-} oper_t;
-
-typedef struct uwu {
-	oper_t op[3];
-	int total, last;
-} uwu_t;
 
 static void
 genops(uwu_t *uwu)
@@ -466,7 +466,7 @@ genops(uwu_t *uwu)
 		uwu->op[0] = (oper_t){ .str = ":3", .len = 2, .op = OP_STR };
 		uwu->total = 1;
 		break;
-	case 3:
+	case 3: ;
 		const str_t *str = &strs[random() % LENGTH(strs)];
 		uwu->op[0] = (oper_t){ .str = str->str,
 				.len = str->len, .op = OP_STR };
@@ -508,11 +508,11 @@ genops(uwu_t *uwu)
 				.len = random() % 75 + 25, .op = OP_NGRAM };
 		uwu->total = 2;
 		break;
-	default:
+	default: ;
 	}
 }
 
-int
+static int
 runops(oper_t *op, char *buf)
 {
 	switch (op->op) {
@@ -531,7 +531,7 @@ runops(oper_t *op, char *buf)
 	case OP_REPEAT:
 		memset(buf, op->ch, op->len);
 		break;
-	default:
+	default: ;
 	}
 	return op->len;
 }
