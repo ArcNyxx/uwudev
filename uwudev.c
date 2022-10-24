@@ -31,7 +31,7 @@ typedef struct repeat {
 } repeat_t;
 
 typedef enum opcode {
-	OP_NULL, OP_NGRAM, OP_STR, OP_REPEAT
+	OP_NGRAM, OP_STR, OP_REPEAT
 } opcode_t;
 
 typedef struct oper {
